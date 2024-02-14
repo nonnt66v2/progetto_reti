@@ -1,4 +1,4 @@
-## Table of Contents
+## Tabella dei Contenuti
 1. [Traccia](#traccia---università)
 2. [Consegna Progetto](#consegna-progetto)
 3. [Formato consegna](#formato-consegna)
