@@ -39,7 +39,7 @@ Il progetto deve essere sviluppato secondo le seguenti linee:
 - inserire sufficienti commenti;
 - --
 ## Consegna progetto
-[Documentazione] (#Documentazione)
+# Documentazione
 
 Lo studente deve presentare la documentazione relativa al progetto. La
 documentazione deve contenere:
@@ -52,8 +52,33 @@ documentazione deve contenere:
 
 > E' possibile redigere la documentazione usando latex o markdown
 
->> Per chi usa latex . Si consiglia di utilizzare la piattaforma Overleaf:
+>> **Per chi usa latex** . Si consiglia di utilizzare la piattaforma Overleaf:
 >> - https://www.overleaf.com/
 
->> Per i markdown.
+>> **Per i markdown**.
 >>- https://mystmd.org/
+>>- Pagine descrittive usando Jekyll (https://jekyllrb.com/) o Hugo (https://gohugo.io/)
+>>>- Consigliato usare le github pages (https://pages.github.com/)
+
+# Formato consegna
+Ogni gruppo deve consegnare tutti i file e la documentazione tramite un servizio git
+remoto (github, gitlab, ...):
+
+- Creare un repository pubblico!
+- Ogni partecipante del gruppo deve essere aggiunto come collaboratore
+- Dare nomi significativi ai commit
+***
+# Consegna
+Il progetto va consegnato tramite email al docente
+<a href="mailto:emanuel.dinardo@uniparthenope.it">emanuel.dinardo@uniparthenope.it</a>
+- Obbligatorio inviare l'email dall'account studente
+- Inserire Nome, Cognome e Marticola di tutti i membri del gruppo
+- Inserire il link al repository github
+- Entro una settimana dall'esame
+- --
+## Modalità di esame
+L'esame consisterà nella discussione del progetto con possibili domande sulla parte
+pratica e progettuale e domande di teoria.
+
+I progetti di gruppo devono essere discussi OBBLIGATORIAMENTE da tutti i membri
+lo stesso giorno
