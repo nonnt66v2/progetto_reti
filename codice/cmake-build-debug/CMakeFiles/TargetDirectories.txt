@@ -1,0 +1,3 @@
+/home/nonnt66/Scaricati/uni/progetto_reti/codice/cmake-build-debug/CMakeFiles/codice.dir
+/home/nonnt66/Scaricati/uni/progetto_reti/codice/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/nonnt66/Scaricati/uni/progetto_reti/codice/cmake-build-debug/CMakeFiles/rebuild_cache.dir

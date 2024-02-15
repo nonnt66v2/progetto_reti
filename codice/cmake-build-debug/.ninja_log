@@ -1,0 +1,5 @@
+# ninja log v5
+0	33	1707986987756966923	CMakeFiles/codice.dir/server.c.o	56e4860f5caf678c
+1	31	1707987958403051650	CMakeFiles/codice.dir/server.c.o	56e4860f5caf678c
+1	33	1707987958407051482	CMakeFiles/codice.dir/studente.c.o	341df7926660523b
+1	38	1707987958411051314	CMakeFiles/codice.dir/libreria/wrapper.c.o	c2b6605b0aa927ea
