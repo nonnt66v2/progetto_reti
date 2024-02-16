@@ -49,8 +49,8 @@ cmake_ninja_workdir = /home/nonnt66/Scaricati/uni/progetto_reti/codice/cmake-bui
 
 build cmake_object_order_depends_target_codice: phony || CMakeFiles/codice.dir
 
-build CMakeFiles/codice.dir/server.c.o: C_COMPILER__codice_unscanned_Debug /home/nonnt66/Scaricati/uni/progetto_reti/codice/server.c || cmake_object_order_depends_target_codice
-  DEP_FILE = CMakeFiles/codice.dir/server.c.o.d
+build CMakeFiles/codice.dir/segreteria.c.o: C_COMPILER__codice_unscanned_Debug /home/nonnt66/Scaricati/uni/progetto_reti/codice/segreteria.c || cmake_object_order_depends_target_codice
+  DEP_FILE = CMakeFiles/codice.dir/segreteria.c.o.d
   FLAGS = -g -std=gnu11 -fdiagnostics-color=always
   OBJECT_DIR = CMakeFiles/codice.dir
   OBJECT_FILE_DIR = CMakeFiles/codice.dir
@@ -75,7 +75,7 @@ build CMakeFiles/codice.dir/libreria/wrapper.c.o: C_COMPILER__codice_unscanned_D
 #############################################
 # Link the executable codice
 
-build codice: C_EXECUTABLE_LINKER__codice_Debug CMakeFiles/codice.dir/server.c.o CMakeFiles/codice.dir/studente.c.o CMakeFiles/codice.dir/libreria/wrapper.c.o
+build codice: C_EXECUTABLE_LINKER__codice_Debug CMakeFiles/codice.dir/segreteria.c.o CMakeFiles/codice.dir/studente.c.o CMakeFiles/codice.dir/libreria/wrapper.c.o
   FLAGS = -g
   OBJECT_DIR = CMakeFiles/codice.dir
   POST_BUILD = :
