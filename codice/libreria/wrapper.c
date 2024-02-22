@@ -4,6 +4,9 @@
 
 #include "wrapper.h"
 
+
+
+
 int getSocket(int famiglia, int tipo, int protocollo) {
     int sockfd;
     if ((sockfd = socket(famiglia, tipo, protocollo)) < 0) {
@@ -14,7 +17,7 @@ int getSocket(int famiglia, int tipo, int protocollo) {
 }
 
 void setInet(int famiglia, char *indirizzo, struct sockaddr_in servaddr) {
-    if (inet_pton(famiglia, indirizzo, &servaddr.sin_addr.s_addr) < 0) {
+    if (inet_pton(famiglia, indirizzo, &servaddr.sin_addr) < 0) {
         fprintf(stderr, "inet_pton error for %s\n", indirizzo);
         exit(1);
     }
@@ -42,7 +45,7 @@ void Read(int sockfd, char buffer[], ssize_t bufferSize) {
     }
 };
 
-void Write(int connfd, const void* buffer, ssize_t bufferSize) {
+void Write(int connfd, const void *buffer, ssize_t bufferSize) {
     if (write(connfd, buffer, bufferSize) < 0) {
         perror("write");
         exit(1);
@@ -51,8 +54,8 @@ void Write(int connfd, const void* buffer, ssize_t bufferSize) {
 
 int getListenSocket(int famiglia, int tipo, int protocollo) {
     int listenfd;
-    if ((listenfd = socket(famiglia, tipo, 0)) < 0) {
-        perror("socket");
+    if ((listenfd = socket(famiglia, tipo, protocollo)) < 0) {
+        perror("listen socket");
         exit(1);
     }
     return listenfd;
@@ -67,7 +70,7 @@ void bindListener(int listenfd, struct sockaddr_in servaddr, ssize_t servSize) {
 
 int accettaConnessione(int listenfd, struct sockaddr *clientaddr, socklen_t *clientAddrSize) {
     int connfd;
-    if ((connfd = accept(listenfd, (struct sockaddr *) &clientaddr, (socklen_t*)&clientAddrSize)) < 0) {
+    if ((connfd = accept(listenfd, (struct sockaddr *) &clientaddr, (socklen_t *) &clientAddrSize)) < 0) {
         perror("accept");
         exit(1);
     }
@@ -93,6 +96,7 @@ ssize_t FullWrite(int fd, const void *buf, size_t count) {
     }
     return (nleft);
 }
+
 ssize_t FullRead(int fd, void *buf, size_t count) {
     size_t nleft;
     ssize_t nread;
@@ -112,23 +116,52 @@ ssize_t FullRead(int fd, void *buf, size_t count) {
     return (nleft);
 }
 
-int setPorta(){
+int setPorta() {
     int porta;
-    FILE *fp = fopen("porta/porta.txt","r+");
-    fscanf(fp,"%d",&porta);
+    FILE *fp = fopen("porta/porta.txt", "r+");
+    fscanf(fp, "%d", &porta);
     rewind(fp);
     porta++;
-    fprintf(fp,"%d\n",porta);
-    printf("porta: %d\n",porta);
+    fprintf(fp, "%d\n", porta);
+    printf("porta: %d\n", porta);
     fclose(fp);
     return porta;
 }
 
-int getPorta(){
+int getPorta() {
     int porta;
-    FILE *fp = fopen("porta/porta.txt","r+");
-    fscanf(fp,"%d",&porta);
-    printf("porta: %d\n",porta);
+    FILE *fp = fopen("porta/porta.txt", "r+");
+    fscanf(fp, "%d", &porta);
+    printf("porta: %d\n", porta);
     fclose(fp);
     return porta;
+}
+/// funzione per collegarsi al database
+/// \param conn
+/// \param host
+/// \param user
+/// \param passwd
+/// \param db
+/// \param port
+/// \param unix_socket
+/// \param clientflag
+void connessioneDB(MYSQL *conn, const char *host, const char *user, const char *passwd, const char *db, unsigned int port,
+              const char *unix_socket, unsigned long clientflag) {
+    conn = mysql_init(NULL);
+    if (conn == NULL) {
+        fprintf(stderr, "mysql_init() fallita\n");
+        exit(1);
+    }
+
+    /**
+     * Connessione vera e propria al database MySQL specificato da host, user, password e nome dello schema.
+     */
+    if (mysql_real_connect(conn, host, user, passwd, db, port, unix_socket, clientflag) == NULL) {
+        fprintf(stderr, "mysql_real_connect() fallita: %s\n", mysql_error(conn));
+        mysql_close(conn);
+        exit(1);
+    }
+    else{
+        printf("Connessione al database avvenuta con successo\n");
+    }
 }

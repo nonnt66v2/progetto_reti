@@ -16,8 +16,16 @@
 #include <signal.h>
 #include <errno.h>
 #include <netdb.h>
+#include <mysql/mysql.h>
 
-/* COMMENTI IN "LIB.C" */
+
+/*** variabili globali ***/
+/***
+ * PORT_SERVER: porta a cui collegarsi lato server
+ * PORT_CLIENT: porta a cui collegarsi lato client
+ */
+extern int PORT_SERVER;
+extern int PORT_CLIENT;
 
 /// genera un socket
 /// \param famiglia AF_INET IPV4
@@ -104,5 +112,18 @@ int setPorta();
 ///client
 /// \return numero porta
 int getPorta();
+
+/// funzione per collegarsi al database
+/// \param mysql
+/// \param host
+/// \param user
+/// \param passwd
+/// \param db
+/// \param port
+/// \param unix_socket
+/// \param clientflag
+void connessioneDB(MYSQL *conn, const char *host, const char *user, const char *passwd, const char *db, unsigned int port,
+              const char *unix_socket, unsigned long clientflag);
+
 
 #endif //RETI_WRAPPER_H

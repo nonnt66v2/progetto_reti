@@ -6,4 +6,8 @@ set(CMAKE_C_STANDARD 11)
 add_executable(codice
         segreteria.c
         studente.c
-        libreria/wrapper.c)
+        libreria/wrapper.c
+        server.c
+        start.c
+        tmp.c
+        tmp.c)
