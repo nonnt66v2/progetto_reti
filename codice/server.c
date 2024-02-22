@@ -223,134 +223,72 @@ void aggiungiPrenotazione(int connfd) {
 
     int id, mat;
 
-    /**
-     * Leggiamo dalla socket di connessione con la segreteria l'id dell'appello al quale lo studente si vuole prenotare.
+    /***
+     * Leggiamo dalla socket di connessione con la segreteria l'id dell'appello al quale lo studente vuole prenotarsi.
      */
     read(connfd, &id, sizeof(id));
-
-    /**
-     * Leggiamo dalla socket di connessione con la segreteria la matricola dello studente che si vuole prenotare
-     * all'appello.
-     */
     read(connfd, &mat, sizeof(mat));
 
-    char cds[500];
-    char pds[500];
+    char query_verifica_prenotazione[500];
 
-    snprintf(cds, sizeof(cds), "SELECT e.cds FROM appello a join esame e on a.nome = e.nome WHERE id = %d", id);
+    snprintf(query_verifica_prenotazione, sizeof(query_verifica_prenotazione),
+             "select a.id_esame, MIN(data_appello)\n"
+             "from appello a\n"
+             "         join esame e\n"
+             "         join studente s\n"
+             "where a.id_esame = %d\n"
+             "  and data_appello > sysdate()\n"
+             "  and anno_corso_studente >= e.anno_corso_esame\n"
+             "  and s.mat_studente = %d\n"
+             "and (select count(*) from supera s where s.mat_studente = %d and s.id_esame = %d) = 0"
+    "group by a.id_esame;", id, mat,id,mat);
 
-    if (mysql_query(conn, cds) != 0) {
-        fprintf(stderr, "mysql_query(cds) fallita: %s", mysql_error(conn));
+    if (mysql_query(conn, query_verifica_prenotazione) != 0) {
+        fprintf(stderr, "mysql_query(query_verifica_prenotazione): %s", mysql_error(conn));
     }
 
-    MYSQL_RES *res_cds = mysql_store_result(conn);
-    if (res_cds == NULL) {
-        fprintf(stderr, "mysql_store_result(cds) fallita: %s", mysql_error(conn));
+    MYSQL_RES *res_qvp = mysql_store_result(conn);
+    if (res_qvp == NULL) {
+        fprintf(stderr, "mysql_store_result(query_verifica_prenotazione): %s", mysql_error(conn));
     }
 
-    unsigned int rows = mysql_num_rows(res_cds);
-    /**
-     * Se non ci sono righe risultanti dalla query soprastante significa che non esiste un appello con questo id
-     * e quindi non si procede all'inserimento della nuova prenotazione, altrimenti si continua con le operazioni
-     * successive.
+    unsigned int rows = mysql_num_rows(res_qvp);
+    /***
+     * Se non esiste un appello con questo id e questa data allora restituisco un errore
      */
     if (!rows) {
-        const char *err = "non esiste un appello con questo id!";
+        const char *err = "invalid id or data!";
         write(connfd, err, strlen(err));
     } else {
-        MYSQL_ROW row_cds = mysql_fetch_row(res_cds);
-        char cds_name[255];
-        sscanf(row_cds[0], "%[^\n]", cds_name);
+        MYSQL_ROW row_qvp = mysql_fetch_row(res_qvp);
+        int id_esame = strtol(row_qvp[0],NULL,10);
+        char data_appello[12];
+        strcpy(data_appello, row_qvp[1]);
 
-        mysql_free_result(res_cds);
-
-        snprintf(pds, sizeof(pds), "SELECT piano_studi FROM studente WHERE matricola = %d", mat);
-
-        if (mysql_query(conn, pds) != 0) {
-            fprintf(stderr, "mysql_query(pds) fallita: %s", mysql_error(conn));
-        }
-
-        MYSQL_RES *res_pds = mysql_store_result(conn);
-        if (res_pds == NULL) {
-            fprintf(stderr, "mysql_store_result(pds) fallita: %s", mysql_error(conn));
-        }
-
-        MYSQL_ROW row_pds = mysql_fetch_row(res_pds);
-        char pds_name[255];
-        sscanf(row_pds[0], "%[^\n]", pds_name);
-
-        mysql_free_result(res_pds);
-        /**
-         * Controlliamo che l'appello al quale lo studente vuole iscriversi appartenga ad un esame che fa parte del corso
-         * di studi a cui lo stesso studente è iscritto.
-         */
-        if (strcmp(cds_name, pds_name) != 0) {
-            const char *err = "non esiste un esame con questo nome nel tuo corso di studi!";
-            write(connfd, err, strlen(err));
-        } else {
-            /**
-            * Componiamo una stringa che fungerà da query di inserimento nella tabella prenotazione.
-            */
-            char query[500];
-
-            snprintf(query, sizeof(query),
-                     "INSERT INTO prenotazione (idAppello, matricola, data_prenotazione) VALUES ('%d', '%d', NOW())",
-                     id, mat);
-
-            /**
-             * Eseguo una query di inserimento a partire dall'oggetto di connessione precedentemente inizializzato
-             * e dalla stringa appena definita.
-             */
-            if (mysql_query(conn, query) != 0) {
-                if (strstr(mysql_error(conn), "Duplicate entry")) {
-                    const char *err = "sei gia' prenotato per questo appello!";
-                    write(connfd, err, strlen(err));
-                } else {
-                    const char *err = mysql_error(conn);
-                    write(connfd, err, strlen(err));
-                }
+        char query[255];
+        snprintf(query, sizeof(query),
+                 "insert into prenota (mat_studente, id_esame, data_prenotazione) VALUES ('%d', '%d', sysdate());",
+                 id_esame, mat);
+        if (mysql_query(conn, query) != 0) {
+            if (strstr(mysql_error(conn), "foreign key constraint fails")) {
+                const char *err = "non esiste un appello con questo id!";
+                write(connfd, err, strlen(err));
             } else {
-                const char *ins = "inserimento della nuova prenotazione completato con successo!";
-                write(connfd, ins, strlen(ins));
-
-                char q3[255];
-
-                snprintf(q3, sizeof(q3), "SELECT COUNT(*) FROM prenotazione where idAppello = %d", id);
-
-                /**
-                 * Eseguo una query a partire dall'oggetto di connessione precedentemente inizializzato
-                 * e dalla stringa appena definita.
-                 */
-                if (mysql_query(conn, q3) != 0) {
-                    fprintf(stderr, "mysql_query() fallita: %s\n", mysql_error(conn));
-                }
-
-                MYSQL_RES *res2 = mysql_store_result(conn);
-                if (res2 == NULL) {
-                    fprintf(stderr, "mysql_store_result() fallita\n");
-                }
-
-                /**
-                 * Viene inviato il numero di prenotazione alla segreteria, che procederà ad inoltrarlo allo studente,
-                 * nel caso in cui venga completata con successo l'operazione di prenotazione.
-                 */
-                int count;
-                MYSQL_ROW row = mysql_fetch_row(res2);
-                sscanf(row[0], "%d", &count);
-
-                write(connfd, &count, sizeof(count));
-
-                mysql_free_result(res2);
-
+                const char *err = mysql_error(conn);
+                write(connfd, err, strlen(err));
             }
+        } else {
+            char res[255];
+            snprintf(res, sizeof(res),
+                     "prenotazione inserita con successo! Il tuo appello è il numero %d e si terrà il %s", id,
+                     data_appello);
+            write(connfd, res, strlen(res));
         }
     }
-
     fflush(stdin);
-
     mysql_close(conn);
-
 }
+
 
 MYSQL *connection() {
     /**

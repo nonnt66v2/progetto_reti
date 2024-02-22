@@ -350,16 +350,6 @@ int main(int argc, char **argv) {
                      * L'esito viene inoltrato allo studente.
                      */
                     write(client_sockets[i].connfd, res, sizeof(res));
-
-                    /**
-                     * Nel caso in cui la prenotazione sia andata a buon fine, viene inviato allo studente anche il
-                     * numero di prenotazione, dopo averlo letto dal server universitario.
-                     */
-                    if (strcmp(res, "inserimento della nuova prenotazione completato con successo!") == 0) {
-                        int count;
-                        read(sockfd, &count, sizeof(count));
-                        write(client_sockets[i].connfd, &count, sizeof(count));
-                    }
                 }
                     /**
                      * Se la scelta dello studente era relativa ad un operazione di logout, viene chiusa la socket riguardante

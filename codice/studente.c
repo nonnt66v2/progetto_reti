@@ -185,6 +185,9 @@ int main(int argc, char **argv) {
              */
             while ((c = getchar()) != '\n' && c != EOF);
 
+            /***
+             * Invio il codice dell'appello e la matricola alla segreteria.
+             */
             write(sockfd, &cod, sizeof(cod));
             write(sockfd, &mat, sizeof(mat));
 
@@ -194,17 +197,11 @@ int main(int argc, char **argv) {
              * Lo studente riceve dalla segreteria l'esito dell'operazione e se la prenotazione è stata inserita con
              * successo lo studente vedrà anche il numero della sua prenotazione.
              */
-            read(sockfd, res, sizeof(res));
 
             printf("\nEsito operazione: %s\n", res);
+            read(sockfd, res, sizeof(res));
+            printf("%s\n", res);
 
-            if (strcmp(res, "inserimento della nuova prenotazione completato con successo!") == 0) {
-                int count;
-                read(sockfd, &count, sizeof(count));
-
-                printf("Numero prenotazione: %d", count);
-                printf("\n");
-            }
         }
             /**
              * Se la scelta è 3 significa che lo studente vuole effettuare un'operazione di logout, di conseguenza si procede
