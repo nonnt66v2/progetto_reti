@@ -35,9 +35,14 @@ int main(int argc, char **argv) {
     sockfd = getSocket(AF_INET, SOCK_STREAM, 0);
     servaddr.sin_family = AF_INET;
     servaddr.sin_port = htons(PORT_CLIENT);
-    setInet(AF_INET, argv[1], servaddr);
-    connessioneSocket(sockfd, servaddr, sizeof(servaddr));
-
+    if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) < 0) {
+        fprintf(stderr, "inet_pton error for %s\n", argv[1]);
+        exit(1);
+    }
+    if (connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
+        fprintf(stderr, "connect error\n");
+        exit(1);
+    }
     // SEGRETERIA SERVER
 
     listenfd = getListenSocket(AF_INET, SOCK_STREAM, 0);
@@ -226,7 +231,7 @@ int main(int argc, char **argv) {
                      */
                     if (req == 1) {
                         snprintf(query, sizeof(query),
-                                 "SELECT a.id_esame , e.nome_esame , DATE_FORMAT(a.data_appello, '%%Y-%%m-%%d') FROM appello a join esame e ON a.id_esame = e.id_esame  WHERE anno_corso_esame <= (SELECT anno_corso_studente FROM studente WHERE mat_studente = %d)",client_sockets[i].matricola);
+                                 "SELECT a.id_esame , e.nome_esame , DATE_FORMAT(a.data_appello, '%%Y-%%m-%%d') FROM appello a join esame e ON a.id_esame = e.id_esame  WHERE anno_corso_esame <= (SELECT anno_corso_studente FROM studente WHERE mat_studente = '%d')",client_sockets[i].matricola);
 
                         if (mysql_query(conn, query) != 0) {
                             fprintf(stderr, "mysql_query() %s\n", mysql_error(conn));
@@ -278,7 +283,7 @@ int main(int argc, char **argv) {
                         read(client_sockets[i].connfd, exam, sizeof(exam));
 
                         snprintf(query, sizeof(query),"SELECT a.id_esame AS \"identidficativo\", e.nome_esame AS \"nome esame\", DATE_FORMAT(a.data_appello, '%%Y-%%m-%%d') AS \"data esame\" FROM appello a\n"
-                                                      "join esame e ON a.id_esame = e.id_esame  WHERE anno_corso_esame <= (SELECT anno_corso_studente FROM studente WHERE mat_studente = %d) AND nome_esame = '%s'",client_sockets[i].matricola, exam);
+                                                      "join esame e ON a.id_esame = e.id_esame  WHERE anno_corso_esame <= (SELECT anno_corso_studente FROM studente WHERE mat_studente = '%d') AND nome_esame = '%s'",client_sockets[i].matricola, exam);
 
                         if (mysql_query(conn, query) != 0) {
                             fprintf(stderr, "mysql_query() fallita\n");

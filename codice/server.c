@@ -21,7 +21,6 @@ int main() {
     int listenfd, connfd = -1;
     int request;
     struct sockaddr_in servaddr;
-    printf("Server in attesa di connessioni...\n");
     /**
      * Utilizzo la system call socket, che prende in input tre parametri di tipo intero, per creare una nuova socket
      * da associare al descrittore "listenfd". I tre parametri in input riguardano, in ordine, il dominio
@@ -67,6 +66,7 @@ int main() {
      * all'interno della funzione select.
      */
 
+    printf("Server in esecuzione...\n");
     fd_set read_set;
     int max_fd;
     max_fd = listenfd;
@@ -232,24 +232,26 @@ void aggiungiPrenotazione(int connfd) {
     char query_verifica_prenotazione[500];
 
     snprintf(query_verifica_prenotazione, sizeof(query_verifica_prenotazione),
-             "select a.id_esame, MIN(data_appello)\n"
-             "from appello a\n"
-             "         join esame e\n"
-             "         join studente s\n"
-             "where a.id_esame = %d\n"
-             "  and data_appello > sysdate()\n"
-             "  and anno_corso_studente >= e.anno_corso_esame\n"
-             "  and s.mat_studente = %d\n"
-             "and (select count(*) from supera s where s.mat_studente = %d and s.id_esame = %d) = 0"
-    "group by a.id_esame;", id, mat,id,mat);
+             "select a.id_esame, MIN(data_appello) "
+             "from appello a "
+             "join esame e "
+             "join studente s "
+             "where a.id_esame = %d "
+             "and data_appello > sysdate() "
+             "and anno_corso_studente >= e.anno_corso_esame "
+             "and s.mat_studente = '%d' "
+             "and (select count(*) from supera s where s.mat_studente = '%d' and s.id_esame = %d) = 0 "
+             "group by a.id_esame;", id, mat, id, mat);
 
     if (mysql_query(conn, query_verifica_prenotazione) != 0) {
-        fprintf(stderr, "mysql_query(query_verifica_prenotazione): %s", mysql_error(conn));
+        fprintf(stderr, "\nmysql_query(query_verifica_prenotazione): %s\n", mysql_error(conn));
+        write(connfd, mysql_error(conn), strlen(mysql_error(conn)));
     }
 
     MYSQL_RES *res_qvp = mysql_store_result(conn);
     if (res_qvp == NULL) {
-        fprintf(stderr, "mysql_store_result(query_verifica_prenotazione): %s", mysql_error(conn));
+        fprintf(stderr, "\nmysql_store_result(query_verifica_prenotazione): %s\n", mysql_error(conn));
+        write(connfd, mysql_error(conn), strlen(mysql_error(conn)));
     }
 
     unsigned int rows = mysql_num_rows(res_qvp);
@@ -261,27 +263,20 @@ void aggiungiPrenotazione(int connfd) {
         write(connfd, err, strlen(err));
     } else {
         MYSQL_ROW row_qvp = mysql_fetch_row(res_qvp);
-        int id_esame = strtol(row_qvp[0],NULL,10);
+        int id_esame = strtol(row_qvp[0], NULL, 10);
         char data_appello[12];
         strcpy(data_appello, row_qvp[1]);
 
-        char query[255];
-        snprintf(query, sizeof(query),
-                 "insert into prenota (mat_studente, id_esame, data_prenotazione) VALUES ('%d', '%d', sysdate());",
-                 id_esame, mat);
-        if (mysql_query(conn, query) != 0) {
-            if (strstr(mysql_error(conn), "foreign key constraint fails")) {
-                const char *err = "non esiste un appello con questo id!";
-                write(connfd, err, strlen(err));
-            } else {
-                const char *err = mysql_error(conn);
-                write(connfd, err, strlen(err));
-            }
+        char inserimento[255];
+        snprintf(inserimento, sizeof(inserimento),
+                 "insert into prenota (mat_studente, id_esame, data_prenotazone) VALUES ('%d', %d, sysdate());",
+                 mat, id_esame);
+        if (mysql_query(conn, inserimento) != 0) {
+            write(connfd, mysql_error(conn), strlen(mysql_error(conn)));
         } else {
             char res[255];
             snprintf(res, sizeof(res),
-                     "prenotazione inserita con successo! Il tuo appello è il numero %d e si terrà il %s", id,
-                     data_appello);
+                     "prenotazione inserita con successo! Il tuo appello si terrà il %s", data_appello);
             write(connfd, res, strlen(res));
         }
     }
@@ -289,7 +284,10 @@ void aggiungiPrenotazione(int connfd) {
     mysql_close(conn);
 }
 
-
+/***
+ * Funzione per la connessione al database MySQL.
+ * @return
+ */
 MYSQL *connection() {
     /**
      * Inizializzazione della connessione MySQL, con la funzione init che restituisce un puntatore a questa struttura.

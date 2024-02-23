@@ -191,7 +191,7 @@ int main(int argc, char **argv) {
             write(sockfd, &cod, sizeof(cod));
             write(sockfd, &mat, sizeof(mat));
 
-            char res[255] = {0};
+            char res[255];
 
             /**
              * Lo studente riceve dalla segreteria l'esito dell'operazione e se la prenotazione è stata inserita con
