@@ -18,32 +18,27 @@
 
 
 % Impostazioni per lo stile del codice Java
+% Impostazioni per il codice C
 \lstset{
-	language=Java,
-	basicstyle=\ttfamily\small,
-	keywordstyle=\color{blue},
-	commentstyle=\color{green!60!black},
-	stringstyle=\color{orange},
-	numbers=left,
-	numberstyle=\tiny,
-	stepnumber=1,
-	numbersep=5pt,
-	backgroundcolor=\color{gray!5},
-	showspaces=false,
-	showstringspaces=false,
-	showtabs=false,
-	frame=single,
-	rulecolor=\color{black},
-	tabsize=4,
-	captionpos=b,
-	breaklines=true,
-	breakatwhitespace=false,
-	title=\lstname,
-	escapeinside={\%}{)},
-	morekeywords={*,...}
+	language=C, % Linguaggio del codice
+	basicstyle=\small\ttfamily, % Stile del testo base
+	keywordstyle=\color{blue}, % Stile delle parole chiave
+	commentstyle=\color{green!40!black}, % Stile dei commenti
+	stringstyle=\color{orange}, % Stile delle stringhe
+	numbers=left, % Posizione dei numeri di riga
+	numberstyle=\tiny\color{gray}, % Stile dei numeri di riga
+	stepnumber=1, % Incremento dei numeri di riga
+	showstringspaces=false, % Mostra gli spazi nelle stringhe
+	breaklines=true, % Spezza le linee lunghe
+	frame=single, % Cornice intorno al codice
+	framerule=0.5pt, % Spessore della cornice
+	backgroundcolor=\color{gray!10}, % Colore dello sfondo
+	captionpos=b, % Posizione della didascalia
+	tabsize=3, % Dimensione del tab
+	morekeywords={size_t, ssize_t}, % Parole chiave aggiuntive
 }
 
-\title{Template per la tesina in .tex}
+\title{Relazione Reti}
 \author{Lorenzo Di Palo}
 \date{29/02/2024}
 
@@ -56,7 +51,9 @@
 	%% FRONTESPIZIO
 	{ \thispagestyle{empty}
 		
-		
+		\begin{center}
+				\includegraphics[scale=0.7]{img/logo.png}
+		\end{center}
 		\vskip 1cm \large \centerline{\textsc{Università degli Studi di
 				Napoli ``Parthenope''}}
 		
@@ -95,12 +92,20 @@
 		\vskip 2.0 cm \Large \centerline {Anno Accademico 2023-2024}
 		\vfill \eject}
 	
+	
+	\markboth{Indice}{Indice}
 	\tableofcontents
 	
 	\newpage
 	
 	\pagenumbering{arabic}
 	\input{capitoli/cap0.tex}
+	\input{capitoli/cap1.tex}
+	\input{capitoli/cap2.tex}
+	\input{capitoli/cap3.tex}
+	\input{capitoli/cap4.tex}
+	
+	
 	\newpage
 	\pagestyle{plain}
 	

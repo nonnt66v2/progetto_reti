@@ -1,0 +1,101 @@
+\newpage
+\section{Segreteria}
+\subsection{Connessione al Server Universitario}
+La connessione al server universitario rispecchia la connessione avvenuta in \ref{lst:ccs}
+
+\subsection{Hosting}
+La connessione da parte di $Studente$ richiede una socket che rimanga in ascolto in attesa di nuove connessioni\\
+In questo caso la socket è "listenfd"\\
+ \begin{lstlisting}[caption=Codice Ascolto Socket, label=lst:cass]
+ 	listenfd = getListenSocket(AF_INET, SOCK_STREAM, 0);
+ 	secaddr.sin_family = AF_INET;
+ 	secaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+ 	secaddr.sin_port = htons(PORT_SERVER);
+ 	bindListener(listenfd, secaddr, sizeof(secaddr));
+ 	/**
+ 	* Mettiamo il server in ascolto, specificando quante connessioni possono essere in attesa venire accettate
+ 	* tramite il secondo argomento della chiamata.
+ 	*/
+ 	if ((listen(listenfd, 5)) < 0) {
+ 		perror("Errore nell'operazione di listen!");
+ 		exit(1);
+ 	}
+ \end{lstlisting}
+ \newpage
+\subsection{Connessione al DB "UNIVERSITA"}
+Se la connessione va a buon fine, $conn$ deterrà l'entry point per effettuare query sul DB\\
+\begin{lstlisting}[caption=Codice Connessione DB, label=lst:ccdb]
+	conn = mysql_init(NULL);
+	if (conn == NULL) {
+		fprintf(stderr, "mysql_init() fallita\n");
+		exit(1);
+	}
+	if (mysql_real_connect(conn, "localhost", "nonnt66", "password", "universita", 3306, NULL, 0) == NULL) {
+		fprintf(stderr, "mysql_real_connect() fallita: %s\n", mysql_error(conn));
+		mysql_close(conn);
+		exit(1);
+	} else {
+		printf("Connessione al database avvenuta con successo\n");
+	}
+\end{lstlisting}
+\newpage
+
+
+\subsection{Descrittori}
+\begin{itemize}
+\item Dichiarazione Descrittori:
+\begin{itemize}
+	Identifico 3 set di descrittori:
+	\item \textbf{master\_set: } l'insieme di descrittori che verrà passato alla funzione select, settato inizialmente a zero.
+	\item \textbf{read\_set: } l'insieme di descrittori che
+	verifica quale descrittore è pronto in lettura
+	\item \textbf{write\_set: } l'insieme di descrittori che
+	verifica quale descrittore è pronto in scrittura\\
+\end{itemize}
+Inizialmente i vene impostato il massimo descrittore, scegliendo, tra la socket dello $Studente$ e la socket del $Server$
+\begin{lstlisting}[caption=Codice Descrittori, label=lst:cd]
+	fd_set read_set, write_set, master_set;
+	int max_fd;
+	FD_ZERO(&master_set);
+	
+	FD_SET(sockfd, &master_set);
+	max_fd = sockfd;
+	
+	FD_SET(listenfd, &master_set);
+	max_fd = max(max_fd, listenfd);
+\end{lstlisting}
+\newpage
+\item Selezione Descrittori:
+Si impostano i descrittori al valore della master\_set e si esegue la select per vedere se ci sono connessioni pronte
+\begin{lstlisting}[caption=Codice Descrittori Select, label=lst:cds]
+	if (select(max_fd + 1, &read_set, &write_set, NULL, NULL) < 0) {
+		perror("Errore nell'operazione di select!");
+	}
+\end{lstlisting}
+\item Verifica Descrittore Pronto:
+Vado a verificare quale è il descrittore pronto in lettura/scrittura rispettivamente lato $Studente$, $Server$
+ \begin{lstlisting}[caption=Codice Accettazione Studente - Lettura Scelta Studente, label=lst:caslss]
+  if (FD_ISSET(listenfd, &read_set)) {
+ 	/**
+ 	* La system call accept permette di accettare una nuova connessione (lato server) in entrata da un client.
+ 	*/
+ 	if ((client_sockets[dim].connfd = accept(listenfd, (struct sockaddr *) NULL, NULL)) < 0) {
+ 		perror("Errore nell'operazione di accept!");
+ 	} else {
+ 		/**
+ 		* Si aggiunge il descrittore legato alla nuova connessione da uno studente all'interno dell'array di
+ 		* descrittori master_set e si ricalcola il numero di posizioni da controllare nella select.
+ 		*/
+ 		FD_SET(client_sockets[dim].connfd, &master_set);
+ 		max_fd = max(max_fd, client_sockets[dim].connfd);
+ 		/*** esegue oprazioni SQL ***/
+ 		/*** Itera sui client connessi ***/
+ 		if (FD_ISSET(client_sockets[i].connfd, &read_set) && client_sockets[i].connfd != -1) {
+ 			read(client_sockets[i].connfd, &behaviour, sizeof(behaviour));
+ \end{lstlisting}
+ 
+\end{itemize}
+
+
+
+

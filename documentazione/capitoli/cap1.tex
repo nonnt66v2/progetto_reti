@@ -1,0 +1,54 @@
+\chapter{Descrizione dell'architettura} 
+\newpage
+
+\section{Architettura}
+	Il sistema è costituito da 2 architetture client/server
+	(I/O Multiplexing)
+	\begin{itemize}
+		\item \textbf{Server/Segreteria:} La prima connessione che avviene è questa.\\
+		Quando viene eseguito lo script \texttt{start.sh}\\
+		SERVER - SEGRETERIA - STUDENTE (\ref{studente}) vengono avviati\\
+		il $Server$ attende che la $Segreteria$ si connetta.
+		\item \textbf{Segreteria/Studente:} La seconda connessione avviene dopo che la prima non ha riportato errori.\\
+		Se quest'ultima non riporta errori, \\
+		$Segreteria$ attende l'inserimento delle Credenziali da parte dello $Studente$.
+	\end{itemize}
+	\newpage
+\subsection{Componenti dell'architettura}
+\begin{itemize}
+	\item \textbf{Studente:}\label{studente} Fornisce interfaccia a linea di comando per:\\
+	\begin{itemize}
+	\item \textbf {Visualizza Appelli:}\\ Permette allo $Studente$ di scegliere tra la visualizzazione di tutti gli appelli nel suo corso o di un appello specifico.
+	\item \textbf {Prenota Appello:}\\
+	Richiede all'utente il nome del codice dell'esame al quale vuole prenotarsi e lo prenota nel primo appello disponibile.
+	\item \textbf {Logout:}\\
+	elimina le informazioni della sessione
+	\end{itemize}
+	
+\end{itemize}
+
+\begin{itemize}
+	\item \textbf{Segreteria:}\label{segreteria}  Fornisce interfaccia a linea di comando per:
+	\begin{itemize}
+		\item \textbf{Gestire Studenti:}\\
+		Gestisce le Richieste da parte di $Studente$
+		\item \textbf{Inserire Appelli:}
+		Inserisce nuovi appelli per esami esistenti in $Server$
+	\end{itemize}
+\end{itemize}
+
+\begin{itemize}
+\item \textbf{Server:}\label{server} Fornisce a $Segreteria$ la possibilità di:
+	\begin{itemize}
+		\item \textbf{Aggiunta Appello:}\\
+		\item \textbf{Aggiunta Prenotazione:}\\
+	\end{itemize}
+\end{itemize}
+
+\subsection{Flusso di Comunicazione}
+ Server: Attende connessioni.\\
+ Segreteria: Dopo aver stabilito una connessione con $Server$, $Segreteria$ è pronta a ricevere nuove connessioni.\\
+ Studente: Dopo aver stabilito una connessione, $Studente$ invia le credenziali a $Segreteria$ per l'autenticazione. \\
+ Una volta autenticato, $Studente$ può eseguire le Operazioni descritte in \ref{studente}.\\
+ 
+ 

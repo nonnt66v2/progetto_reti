@@ -1,0 +1,98 @@
+\chapter{Dettagli implementativi dei client/server} 
+\newpage
+
+
+\section{Studente}
+\subsection{Connessione alla Segreteria}
+$Studente$ stabilisce una connessione con $Segreteria$ utilizzando una socket, specificandone\\
+Dominio($AF\_INET$)\\
+Tipo ($SOCK\_STREAM$)\\
+Protocollo (0)\\
+\begin{lstlisting}[caption=Codice Connessione Socket, label=lst:ccs]
+	
+	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
+		perror("Errore nella creazione della socket!");
+		exit(1);
+	}
+	servaddr.sin_family = AF_INET;
+	if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) <= 0) {
+		fprintf(stderr, "Errore inet_pton per %s\n", argv[1]);
+		exit(1);
+	}
+	servaddr.sin_port = htons(PORT_CLIENT);
+	
+	if (connect(sockfd, (struct sockaddr *) &servaddr, sizeof(servaddr)) < 0) {
+		perror("Errore nella connect: ");
+		printf("\n");
+		exit(1);
+	}
+\end{lstlisting}
+\newpage
+\subsection{Autenticazione}
+$Studente$ inserisce credenziali e se non sono presenti nel database viene terminata l'esecuzione.
+\begin{lstlisting}	[caption=Codice Autenticazione Segreteria, label=lst:cas]
+	 printf("LOGIN\n");
+	printf("Inserire matricola: ");
+	scanf("%d", &mat);
+	
+	/**
+	* Pulisco il buffer di input.
+	*/
+	while ((c = getchar()) != '\n' && c != EOF);
+	
+	printf("Inserire password: ");
+	fgets(pass, sizeof(pass), stdin);
+	pass[strlen(pass) - 1] = 0;
+	
+	write(sockfd, &mat, sizeof(mat));
+	write(sockfd, pass, sizeof(pass));
+	
+	char state[255] = {0};
+	read(sockfd, state, sizeof(state));
+	
+	printf("\nEsito login: %s", state);
+	printf("\n");
+	
+	if (strcmp(state, "credenziali non corrette, accesso negato!") == 0) {
+		exit(1);
+	}
+	
+\end{lstlisting}
+\newpage
+\subsection{Scelta Operazione}
+$Studente$ può effettuare una delle scelte riportate in \ref{studente}
+\begin{lstlisting}[caption=Codice Scelta Operazione, label=lst:cso]
+	printf("\nInserire il numero relativo all'operazione che si vuole effettuare:\n");
+	printf("1 - Visualizza appelli disponibili\n");
+	printf("2 - Prenota un appello\n");
+	printf("3 - Logout\n");
+	printf("Scelta: ");
+	scanf("%d", &request);
+	printf("\n");
+	/*** pulisce buffer ***/
+	write(sockfd, &request, sizeof(request));
+	
+\end{lstlisting}
+\newpage
+\subsection{Ottieni Risposta}
+In base alla scelta effettuata, si ottiene una risposta dalla $Segreteria$. (Tentativo Formattazione Testo in C vano)
+\begin{lstlisting}[caption=Codice Ottieni Risposta (Richiesta Appelli), label=lst:cor]
+	read(sockfd, &num_rows, sizeof(num_rows));
+	
+	if (num_rows == 0) {
+		printf("\nNon esistono appelli disponibili!\n");
+	} else {
+		printf("\nAppelli disponibili:\n\n");
+		
+		printf("| ID\tNome esame\tData | \n\n ");
+		for (int i = 0; i < num_rows; i++) {
+			read(sockfd, &id, sizeof(id));
+			read(sockfd, name, sizeof(name));
+			read(sockfd, date, sizeof(date));
+			printf("%d\t%s\t%s\n", id, name, date);
+			printf("-------------------------------\n");
+		}
+	}	
+\end{lstlisting}
+
+
