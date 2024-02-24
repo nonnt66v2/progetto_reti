@@ -1,0 +1,108 @@
+\documentclass[12pt,italian,a4paper,oneside,openright]{book}
+\usepackage{url,amsfonts,epsfig}
+\usepackage[italian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{vmargin}
+\usepackage{amsmath}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\graphicspath{{img/}}
+\usepackage[hyperindex]{hyperref} %per l'indice interattivo
+\hypersetup{colorlinks=true, linkcolor=black} %per colorare i link
+\DeclareGraphicsRule{.jpg}{jpg}{}{} %da commentare per il PDF
+\setmarginsrb{35mm}{30mm}{30mm}{30mm}{0mm}{10mm}{0mm}{10mm}
+
+%\documentclass{article}
+\usepackage{listings}
+\usepackage{xcolor}
+
+
+% Impostazioni per lo stile del codice Java
+\lstset{
+	language=Java,
+	basicstyle=\ttfamily\small,
+	keywordstyle=\color{blue},
+	commentstyle=\color{green!60!black},
+	stringstyle=\color{orange},
+	numbers=left,
+	numberstyle=\tiny,
+	stepnumber=1,
+	numbersep=5pt,
+	backgroundcolor=\color{gray!5},
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	frame=single,
+	rulecolor=\color{black},
+	tabsize=4,
+	captionpos=b,
+	breaklines=true,
+	breakatwhitespace=false,
+	title=\lstname,
+	escapeinside={\%}{)},
+	morekeywords={*,...}
+}
+
+\title{Template per la tesina in .tex}
+\author{Lorenzo Di Palo}
+\date{29/02/2024}
+
+\begin{document}
+	\pagenumbering{Roman}
+	
+	%%%% Opzione per interlinea 2
+	\baselineskip 1.5em
+	
+	%% FRONTESPIZIO
+	{ \thispagestyle{empty}
+		
+		
+		\vskip 1cm \large \centerline{\textsc{Università degli Studi di
+				Napoli ``Parthenope''}}
+		
+		\centerline {\textsc{Facoltà di Scienze e Tecnologie}}
+		
+		\centerline {\small\textsc{Corso di laurea in Informatica}}
+		
+	
+		
+		\vskip 0.5cm
+		
+		\large \centerline {\textsc{Documentazione Reti di Calcolatori}}
+		
+		\vskip 0.5cm
+		
+		\Large \centerline {Traccia:\\Università}
+		
+		
+		\vskip 4.5cm
+		
+		
+		\large
+		\begin{minipage}[t]{7cm}
+			\textsc{Docente}
+			
+			Emanuel Di Nardo\\
+			
+		\end{minipage}
+		\hfill
+		\begin{tabular}[t]{l}
+			\textsc{Candidato} \\
+			Di Palo Lorenzo\\
+			Matricola: 0124002580
+		\end{tabular}
+		
+		\vskip 2.0 cm \Large \centerline {Anno Accademico 2023-2024}
+		\vfill \eject}
+	
+	\tableofcontents
+	
+	\newpage
+	
+	\pagenumbering{arabic}
+	\input{capitoli/cap0.tex}
+	\newpage
+	\pagestyle{plain}
+	
+	
+\end{document}
