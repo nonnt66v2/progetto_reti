@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-    /***
-     * Esegue uno script in un nuovo terminale
-     * @param script_path
-     * @return
-     */
+/***
+ * Esegue uno script in un nuovo terminale
+ * @param script_path
+ * @return
+ */
 void *execute_script(void *script_path);
 
 
@@ -27,6 +27,7 @@ int main() {
             fprintf(stderr, "Errore durante la creazione del thread per lo script %d\n", i + 1);
             exit(EXIT_FAILURE);
         }
+        sleep(1); // Aspettiamo un secondo prima di creare un nuovo thread
     }
 
     /*** Attesa del completamento dei thread ***/
