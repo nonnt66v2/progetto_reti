@@ -39,7 +39,7 @@ int main() {
      */
     servaddr.sin_family = AF_INET;
     servaddr.sin_addr.s_addr = htonl(INADDR_ANY);
-    servaddr.sin_port = htons(PORT_SERVER);
+    servaddr.sin_port = htons(setPorta());
 
     /**
      * La system call bind permette di assegnare l'indirizzo memorizzato nel campo s_addr della struct sin_addr, che è

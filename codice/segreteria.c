@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
     }
     sockfd = getSocket(AF_INET, SOCK_STREAM, 0);
     servaddr.sin_family = AF_INET;
-    servaddr.sin_port = htons(PORT_CLIENT);
+    servaddr.sin_port = htons(getPorta());
     if (inet_pton(AF_INET, argv[1], &servaddr.sin_addr) < 0) {
         fprintf(stderr, "inet_pton error for %s\n", argv[1]);
         exit(1);
